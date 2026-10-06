@@ -6,6 +6,11 @@
   <title>Kilocalorie — Suivi Nutritionnel & Balance Énergétique</title>
   <meta name="description" content="Maîtrisez votre balance énergétique, visualisez vos déficits caloriques et suivez l'évolution réelle de votre poids avec Kilocalorie.">
 
+<!-- Manifest PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FF8C00">
+
+
   <!-- Polices Google Font Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -346,23 +351,31 @@
     // Initialisation des icônes Lucide
     lucide.createIcons();
 
-    // Gestion de l'installation PWA
+    // Enregistrement obligatoire du Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+
+    // Gestion de l'invite d'installation native Android
     let deferredPrompt;
     const installBtn = document.getElementById('pwa-install-btn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
+      // Empêche la bannière par défaut du navigateur
       e.preventDefault();
+      // Conserve l'événement natif pour le déclencher au clic
       deferredPrompt = e;
     });
 
     if (installBtn) {
       installBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
+          // Ouvre la boîte de dialogue système native d'Android
           deferredPrompt.prompt();
           const { outcome } = await deferredPrompt.userChoice;
           deferredPrompt = null;
         } else {
-          alert("Pour installer l'application : ouvrez le menu de votre navigateur (⋮) puis sélectionnez 'Ajouter à l'écran d'accueil'.");
+          alert("L'application est déjà installée ou le navigateur ne gère pas l'invite directe. Utilisez le menu (⋮) > 'Installer l'application'.");
         }
       });
     }
